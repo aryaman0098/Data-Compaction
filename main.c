@@ -88,7 +88,7 @@ int* prefix(int* arr, int N){
 
     int* prefSum = (int*)malloc(sizeof(int) * size);
     
-    #pragma omp parallel shared(prefsum)
+    #pragma omp parallel shared(prefSum)
     {
         #pragma omp for
             for(int i = 0; i < size - 1; i++){
