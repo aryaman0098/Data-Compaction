@@ -26,14 +26,14 @@ int* loadArray(int* arr, char** argv, int N){
         arr = realloc(arr, sizeof(int) * (size + 1));
     }
     
-        trueSize = size + 1;
-        int n = (int)ceil(log2(size));
-        int pow = 1<<n;
-            arr = realloc(arr, sizeof(int) * pow);
+    trueSize = size + 1;
+    int n = (int)ceil(log2(size));
+    int pow = 1<<n;
+    arr = realloc(arr, sizeof(int) * pow);
     
-        for(; size < pow; size++){
-            arr[size] = 0;
-        }
+    for(; size < pow; size++){
+        arr[size] = 0;
+    }
     return arr;
 }
 
@@ -71,14 +71,15 @@ int* prefix(int* arr, int N){
     }
 
     arr[size - 1] = 0;
+    int temp;
 
     for(int d = p_ - 1; d >=0; d--){
         p /= 2;
-        #pragma omp parallel shared(arr, p)
+        #pragma omp parallel shared(arr, p, temp)
         {
             #pragma omp for
                 for(int i = 0; i <= (size - 1); i+=2 * p){
-                    int temp = arr[i + p -1];
+                    temp = arr[i + p -1];
                     arr[i + p - 1] = arr[i + 2 * p -1];
                     arr[i + 2 * p -1] = temp + arr[i + 2 * p -1];
                 }
@@ -86,8 +87,13 @@ int* prefix(int* arr, int N){
     }
 
     int* prefSum = (int*)malloc(sizeof(int) * size);
-    for(int i = 0; i < size - 1; i++){
-        prefSum[i] = arr[i + 1];
+    
+    #pragma omp parallel shared(prefsum)
+    {
+        #pragma omp for
+            for(int i = 0; i < size - 1; i++){
+                prefSum[i] = arr[i + 1];
+            }   
     }
     prefSum[size - 1] = prefSum[size - 2] + last;
 
